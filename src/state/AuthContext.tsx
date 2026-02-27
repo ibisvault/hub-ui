@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { rhub } from "@/api";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -21,29 +22,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(false);
   }, []);
 
-  const login = useCallback(async (username: string, password: string): Promise<boolean> => {
+  const login = useCallback(async (userId: string, pin: string): Promise<boolean> => {
     setError(null);
     setLoading(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        setError(data.message || `Login failed (${response.status})`);
+      const res = await rhub.authenticate({ user_id: userId, pin });
+      if (res.token) {
+        sessionStorage.setItem("auth_token", res.token);
+        setIsAuthenticated(true);
         setLoading(false);
-        return false;
+        return true;
       }
-
-      const data = await response.json();
-      sessionStorage.setItem("auth_token", data.token || data.api_key || "");
-      setIsAuthenticated(true);
+      setError("Login failed — no token returned");
       setLoading(false);
-      return true;
+      return false;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Network error");
       setLoading(false);
