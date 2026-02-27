@@ -60,6 +60,13 @@
     --color-leica-gray: var(--leica-gray);
     --color-can-purple: var(--can-purple);
 
+    /* Animations */
+    @keyframes blink-cursor {
+        0%, 49% { opacity: 1; }
+        50%, 100% { opacity: 0; }
+    }
+    --animate-blink-cursor: blink-cursor 1s step-end infinite;
+
     /* Font families */
     --font-sans: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --font-heading: "Outfit", system-ui, sans-serif;
